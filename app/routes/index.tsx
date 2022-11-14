@@ -5,13 +5,11 @@ export const action: ActionFunction = async ({
   request,
  }) => {
   const formData = await request.formData();
-  // use form data to run graphql request
-  const endpoint = formData.get("endpoint");
-  // create url from endpoint
-  const url = new URL(endpoint?.toString() || "");
+  // create url from env variable
+  const url = new URL(process.env.STEPZEN_ENDPOINT || "");
   const query = formData.get("query")?.toString();
   // apikey comes from env
-  const APIKEY = process.env.STEPZEN_APIKEY;
+  const APIKEY = process.env.STEPZEN_API_KEY;
   const result = await fetch(url, {
     method: "POST",
     headers: {
@@ -24,7 +22,7 @@ export const action: ActionFunction = async ({
     }),
   });
   const data = await result.json();
-  return {data: data, endpoint: endpoint, query: query};
+  return {data: data, query: query};
 };
 
 
@@ -40,22 +38,6 @@ export default function Index() {
       <form method="post" action="/?index">
         <div className="py-10">
           <div>
-            <label
-              htmlFor="url"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Endpoint
-            </label>
-            <div className="relative mt-1 rounded-md shadow-sm">
-              <input
-                type="text"
-                name="endpoint"
-                id="endpoint"
-                className="block w-full rounded-md border-gray-500 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder="https://{account}.stepzen.net/{folder}/{service}/__graphql"
-                defaultValue={actionData?.endpoint}
-              />
-            </div>
             <div>
               <label
                 htmlFor="query"
